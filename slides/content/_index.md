@@ -1,21 +1,44 @@
 +++
-title = "My presentation"
+title = "API Design: OpenAPI vs. gRPC"
 outputs = ["Reveal"]
 +++
 
-# Hello world!
+## API Design
+# OpenAPI vs. gRPC
 
-This is my first slide.
+Simon Hammes
+
+Cloud Computing WS 2023/24
 
 ---
 
-## Second slide
+# OpenAPI/Swagger
 
-Content:
+---
 
-- Element 1
-- Element 2
-- Element 3
+## OpenAPI/Swagger
+- created in 2011 by Tony Tam
+- API specification in JSON/YAML files
+- Goals:
+  - Automate API documentation
+  - Generate code for API clients
+- 2016: Specification was renamed to OpenAPI
+
+---
+
+# OpenAPI Specification
+
+---
+
+<!-- TODO -->
+
+---
+
+# Swagger Tools
+
+---
+
+<!-- TODO -->
 
 ---
 
