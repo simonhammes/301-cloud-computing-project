@@ -1,0 +1,22 @@
+baseURL = 'https://example.org/'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
+theme = ["github.com/dzello/reveal-hugo"]
+
+[markup.goldmark.renderer]
+unsafe = true
+
+# Use highlight.js for syntax highlighting
+# https://github.com/dzello/reveal-hugo#syntax-highlighting
+[markup.highlight]
+codeFences = false
+
+[outputFormats.Reveal]
+baseName = "index"
+mediaType = "text/html"
+isHTML = true
+
+[params.reveal_hugo]
+theme = "moon"
+highlight_theme = "github"
+transition = "zoom"
