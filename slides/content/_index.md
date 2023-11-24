@@ -1,6 +1,8 @@
 +++
 title = "API Design: OpenAPI vs. gRPC"
 outputs = ["Reveal"]
+[reveal_hugo]
+custom_theme = "reveal-hugo/themes/robot-lung.css"
 +++
 
 ## API Design
