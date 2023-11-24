@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  swagger-ui:
+    # https://swagger.io/docs/open-source-tools/swagger-ui/usage/installation/
+    image: swaggerapi/swagger-ui:v5.10.3
+    environment:
+      SWAGGER_JSON: "/app/openapi.yaml"
+    volumes:
+      - "./swagger:/app"
+    ports:
+      - "8080:8080"
+  slides:
+    build:
+      dockerfile: docker/slides/Dockerfile
+    ports:
+      - "8081:80"
