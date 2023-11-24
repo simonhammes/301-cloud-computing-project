@@ -21,5 +21,6 @@ src = "images/hs-worms-logo.png"
 diag = "5%"
 
 [params.reveal_hugo]
+theme = "moon"
 highlight_theme = "github"
 transition = "zoom"
