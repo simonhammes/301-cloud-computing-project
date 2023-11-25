@@ -19,6 +19,7 @@ isHTML = true
 [params.logo]
 src = "images/hs-worms-logo.png"
 diag = "5%"
+width = "10%"
 
 [params.reveal_hugo]
 theme = "white"
