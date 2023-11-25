@@ -113,7 +113,31 @@ components:
 
 ---
 
-<!-- TODO -->
+## Swagger UI
+
+// TODO: Screenshot of aforementioned API
+
+```shell
+docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggerapi/swagger-ui
+```
+
+---
+
+## Swagger Editor
+
+[editor.swagger.io](https://editor.swagger.io)
+
+// TODO: Screenshot of aforementioned API
+
+---
+
+## Swagger Codegen
+
+> The Swagger Codegen is an open source code-generator to build server stubs and client SDKs directly from a Swagger defined RESTful API.
+>
+> <cite><a href="https://swagger.io/docs/open-source-tools/swagger-codegen/">swagger.io/docs/open-source-tools/swagger-codegen</a></cite>
+
+=> CLI/Docker
 
 ---
 
