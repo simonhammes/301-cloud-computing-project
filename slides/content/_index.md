@@ -75,7 +75,7 @@ paths:
 
 ## Components
 
-// TODO
+<!-- TODO -->
 
 ```yaml
 components:
