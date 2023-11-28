@@ -23,5 +23,7 @@ width = "10%"
 
 [params.reveal_hugo]
 theme = "white"
+# https://github.com/dzello/reveal-hugo/issues/58
+custom_css = "css/custom.css"
 highlight_theme = "github"
 transition = "zoom"

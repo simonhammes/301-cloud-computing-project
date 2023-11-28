@@ -1,0 +1,6 @@
+/* https://stackoverflow.com/a/23215172 */
+.reveal pre code {
+    max-height: none;
+    font-size: 16px;
+    line-height: 18px;
+}
