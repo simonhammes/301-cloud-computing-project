@@ -186,6 +186,26 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 
 ---
 
+# Demo
+
+---
+
+## Prerequisites
+- Go
+- protoc
+- protoc plugins for Go
+  - `protoc-gen-go`
+  - `protoc-gen-go-grpc`
+
+{{% note %}}
+```shell
+go version
+protoc --version
+```
+{{% /note %}}
+
+---
+
 ## Core Principles
 <!-- TODO: [Auszug] -->
 - _Services not Objects, Messages not References_
