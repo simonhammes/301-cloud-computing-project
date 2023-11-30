@@ -4,3 +4,12 @@
     font-size: 16px;
     line-height: 18px;
 }
+
+table {
+    font-size: 24px;
+}
+
+table tbody tr:nth-child(odd) {
+    background-color: #D3D3D3;
+    #color: #fff;
+}
