@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"github.com/simonhammes/301-cloud-computing-project/grpc/search"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 )
 
 func main() {
-	// TODO: Fix deprecation
-	connection, err := grpc.Dial("127.0.0.1:3000", grpc.WithInsecure())
+	// Disable TLS
+	options := grpc.WithTransportCredentials(insecure.NewCredentials())
+	connection, err := grpc.Dial("127.0.0.1:3000", options)
 	if err != nil {
 		log.Fatalf("Could not create connection: %v", err)
 	}
