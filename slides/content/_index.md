@@ -176,6 +176,16 @@ service SearchService {
 
 ---
 
+## Workflow
+1. Define messages and services in `.proto` file(s)
+2. Use `protoc` compiler to generate code
+
+{{% note %}}
+Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd party addons
+{{% /note %}}
+
+---
+
 ## Core Principles
 <!-- TODO: [Auszug] -->
 - _Services not Objects, Messages not References_
