@@ -141,6 +141,47 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggera
 
 ---
 
+# gRPC
+
+---
+
+## gRPC
+- RPC (Remote Procedure Call) framework
+- Created by Google in 2001 ("Stubby")
+- Open-sourced in 2015
+- Uses _Protocol Buffers_ as a serialization mechanism
+- _Messages_ and _services_ are defined in `.proto` files
+
+---
+
+## Protocol Buffers
+
+```protobuf
+syntax = "proto3";
+
+message SearchRequest {
+  string query = 1;
+  int32 page_number = 2;
+  int32 results_per_page = 3;
+}
+
+message SearchResponse {
+  int32 number_of_results = 1;
+}
+
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResponse);
+}
+```
+
+---
+
+## Core Principles
+<!-- TODO: [Auszug] -->
+- _Services not Objects, Messages not References_
+
+---
+
 ## Code
 
 ```go{}
