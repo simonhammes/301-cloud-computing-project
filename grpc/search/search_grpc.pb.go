@@ -22,7 +22,14 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SearchServiceClient interface {
+	// Unary
 	Search(ctx context.Context, in *SearchRequest, opts ...grpc.CallOption) (*SearchResponse, error)
+	// Server-side streaming
+	GeneratePrimes(ctx context.Context, in *PrimeGenerationRequest, opts ...grpc.CallOption) (SearchService_GeneratePrimesClient, error)
+	// Client-side streaming
+	RecordLogMessages(ctx context.Context, opts ...grpc.CallOption) (SearchService_RecordLogMessagesClient, error)
+	// Bidirectional streaming
+	LogChat(ctx context.Context, opts ...grpc.CallOption) (SearchService_LogChatClient, error)
 }
 
 type searchServiceClient struct {
@@ -42,11 +49,115 @@ func (c *searchServiceClient) Search(ctx context.Context, in *SearchRequest, opt
 	return out, nil
 }
 
+func (c *searchServiceClient) GeneratePrimes(ctx context.Context, in *PrimeGenerationRequest, opts ...grpc.CallOption) (SearchService_GeneratePrimesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &SearchService_ServiceDesc.Streams[0], "/SearchService/GeneratePrimes", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &searchServiceGeneratePrimesClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type SearchService_GeneratePrimesClient interface {
+	Recv() (*PrimeResponse, error)
+	grpc.ClientStream
+}
+
+type searchServiceGeneratePrimesClient struct {
+	grpc.ClientStream
+}
+
+func (x *searchServiceGeneratePrimesClient) Recv() (*PrimeResponse, error) {
+	m := new(PrimeResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *searchServiceClient) RecordLogMessages(ctx context.Context, opts ...grpc.CallOption) (SearchService_RecordLogMessagesClient, error) {
+	stream, err := c.cc.NewStream(ctx, &SearchService_ServiceDesc.Streams[1], "/SearchService/RecordLogMessages", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &searchServiceRecordLogMessagesClient{stream}
+	return x, nil
+}
+
+type SearchService_RecordLogMessagesClient interface {
+	Send(*LogMessage) error
+	CloseAndRecv() (*LogSummary, error)
+	grpc.ClientStream
+}
+
+type searchServiceRecordLogMessagesClient struct {
+	grpc.ClientStream
+}
+
+func (x *searchServiceRecordLogMessagesClient) Send(m *LogMessage) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *searchServiceRecordLogMessagesClient) CloseAndRecv() (*LogSummary, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(LogSummary)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func (c *searchServiceClient) LogChat(ctx context.Context, opts ...grpc.CallOption) (SearchService_LogChatClient, error) {
+	stream, err := c.cc.NewStream(ctx, &SearchService_ServiceDesc.Streams[2], "/SearchService/LogChat", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &searchServiceLogChatClient{stream}
+	return x, nil
+}
+
+type SearchService_LogChatClient interface {
+	Send(*LogMessage) error
+	Recv() (*LogMessage, error)
+	grpc.ClientStream
+}
+
+type searchServiceLogChatClient struct {
+	grpc.ClientStream
+}
+
+func (x *searchServiceLogChatClient) Send(m *LogMessage) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *searchServiceLogChatClient) Recv() (*LogMessage, error) {
+	m := new(LogMessage)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // SearchServiceServer is the server API for SearchService service.
 // All implementations must embed UnimplementedSearchServiceServer
 // for forward compatibility
 type SearchServiceServer interface {
+	// Unary
 	Search(context.Context, *SearchRequest) (*SearchResponse, error)
+	// Server-side streaming
+	GeneratePrimes(*PrimeGenerationRequest, SearchService_GeneratePrimesServer) error
+	// Client-side streaming
+	RecordLogMessages(SearchService_RecordLogMessagesServer) error
+	// Bidirectional streaming
+	LogChat(SearchService_LogChatServer) error
 	mustEmbedUnimplementedSearchServiceServer()
 }
 
@@ -56,6 +167,15 @@ type UnimplementedSearchServiceServer struct {
 
 func (UnimplementedSearchServiceServer) Search(context.Context, *SearchRequest) (*SearchResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Search not implemented")
+}
+func (UnimplementedSearchServiceServer) GeneratePrimes(*PrimeGenerationRequest, SearchService_GeneratePrimesServer) error {
+	return status.Errorf(codes.Unimplemented, "method GeneratePrimes not implemented")
+}
+func (UnimplementedSearchServiceServer) RecordLogMessages(SearchService_RecordLogMessagesServer) error {
+	return status.Errorf(codes.Unimplemented, "method RecordLogMessages not implemented")
+}
+func (UnimplementedSearchServiceServer) LogChat(SearchService_LogChatServer) error {
+	return status.Errorf(codes.Unimplemented, "method LogChat not implemented")
 }
 func (UnimplementedSearchServiceServer) mustEmbedUnimplementedSearchServiceServer() {}
 
@@ -88,6 +208,79 @@ func _SearchService_Search_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SearchService_GeneratePrimes_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(PrimeGenerationRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(SearchServiceServer).GeneratePrimes(m, &searchServiceGeneratePrimesServer{stream})
+}
+
+type SearchService_GeneratePrimesServer interface {
+	Send(*PrimeResponse) error
+	grpc.ServerStream
+}
+
+type searchServiceGeneratePrimesServer struct {
+	grpc.ServerStream
+}
+
+func (x *searchServiceGeneratePrimesServer) Send(m *PrimeResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func _SearchService_RecordLogMessages_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SearchServiceServer).RecordLogMessages(&searchServiceRecordLogMessagesServer{stream})
+}
+
+type SearchService_RecordLogMessagesServer interface {
+	SendAndClose(*LogSummary) error
+	Recv() (*LogMessage, error)
+	grpc.ServerStream
+}
+
+type searchServiceRecordLogMessagesServer struct {
+	grpc.ServerStream
+}
+
+func (x *searchServiceRecordLogMessagesServer) SendAndClose(m *LogSummary) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *searchServiceRecordLogMessagesServer) Recv() (*LogMessage, error) {
+	m := new(LogMessage)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+func _SearchService_LogChat_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SearchServiceServer).LogChat(&searchServiceLogChatServer{stream})
+}
+
+type SearchService_LogChatServer interface {
+	Send(*LogMessage) error
+	Recv() (*LogMessage, error)
+	grpc.ServerStream
+}
+
+type searchServiceLogChatServer struct {
+	grpc.ServerStream
+}
+
+func (x *searchServiceLogChatServer) Send(m *LogMessage) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *searchServiceLogChatServer) Recv() (*LogMessage, error) {
+	m := new(LogMessage)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // SearchService_ServiceDesc is the grpc.ServiceDesc for SearchService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -100,6 +293,23 @@ var SearchService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SearchService_Search_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GeneratePrimes",
+			Handler:       _SearchService_GeneratePrimes_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RecordLogMessages",
+			Handler:       _SearchService_RecordLogMessages_Handler,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "LogChat",
+			Handler:       _SearchService_LogChat_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "search/search.proto",
 }
