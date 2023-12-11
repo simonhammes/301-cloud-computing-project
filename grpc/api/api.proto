@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+option go_package = "github.com/simonhammes/301-cloud-computing-project/grpc/api";
+
+message GetStudentByIdRequest {
+  int32 id = 1;
+}
+
+message Student {
+  int32 id = 1;
+  string name = 2;
+}
+
+message GetStudentsRequest {
+  int32 per_message = 1;
+}
+
+message GetStudentsResponse {
+  repeated Student students = 1;
+}
+
+message ImportStudentsRequest {
+  repeated Student students = 1;
+}
+
+message ImportStudentsResponse {
+  int32 count = 1;
+}
+
+message ImportStudentsV2Request {
+  repeated Student students = 1;
+}
+
+message ImportStudentsV2Response {
+  repeated Student students = 1;
+}
+
+service StudentsService {
+  // Unary
+  rpc GetStudentById(GetStudentByIdRequest) returns (Student);
+  // Server-side streaming
+  rpc GetStudents(GetStudentsRequest) returns (stream GetStudentsResponse);
+  // Client-side streaming
+  // Imports students and returns number of imported students
+  rpc ImportStudents(stream ImportStudentsRequest) returns (ImportStudentsResponse);
+  // Bidirectional streaming
+  // Imports students and returns them with generated IDs
+  rpc ImportStudentsV2(stream ImportStudentsV2Request) returns (stream ImportStudentsV2Response);
+}

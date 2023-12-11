@@ -3,65 +3,63 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/simonhammes/301-cloud-computing-project/grpc/search"
+	"github.com/go-faker/faker/v4"
+	"github.com/simonhammes/301-cloud-computing-project/grpc/api"
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	"math/rand"
 	"net"
 	"time"
 )
 
 type server struct {
-	search.SearchServiceServer
+	api.StudentsServiceServer
 }
 
-func (s *server) Search(_ context.Context, _ *search.SearchRequest) (*search.SearchResponse, error) {
-	response := &search.SearchResponse{
-		NumberOfResults: 42,
+func (s *server) GetStudentById(_ context.Context, request *api.GetStudentByIdRequest) (*api.Student, error) {
+	response := &api.Student{
+		Id:   request.Id,
+		Name: "John Doe",
 	}
 
 	return response, nil
 }
 
-func (s *server) GeneratePrimes(r *search.PrimeGenerationRequest, stream search.SearchService_GeneratePrimesServer) error {
-	primes := sieveOfEratosthenes(int(r.Limit))
+func (s *server) GetStudents(request *api.GetStudentsRequest, stream api.StudentsService_GetStudentsServer) error {
+	id := int32(1)
+	for i := 1; i <= 10; i++ {
+		// Simulate database query/network request
+		time.Sleep(time.Second)
 
-	for _, prime := range primes {
-		response := search.PrimeResponse{Prime: int32(prime)}
+		// Generate fake data
+		students := make([]*api.Student, request.PerMessage)
+		for j := 0; j < int(request.PerMessage); j++ {
+			name := fmt.Sprintf("%s %s", faker.FirstName(), faker.LastName())
+			students[j] = &api.Student{Id: id, Name: name}
+			id++
+		}
+
+		response := api.GetStudentsResponse{Students: students}
+
 		if err := stream.Send(&response); err != nil {
 			return err
 		}
-
-		// Sleep for 1 second
-		time.Sleep(time.Second)
 	}
 
 	return nil
 }
 
-// Return list of primes smaller than N
-func sieveOfEratosthenes(N int) (primes []int) {
-	b := make([]bool, N)
-	for i := 2; i < N; i++ {
-		if b[i] == true {
-			continue
-		}
-		primes = append(primes, i)
-		for k := i * i; k < N; k += i {
-			b[k] = true
-		}
-	}
-	return
-}
-
-func (s *server) RecordLogMessages(stream search.SearchService_RecordLogMessagesServer) error {
-	count := 0
+func (s *server) ImportStudents(stream api.StudentsService_ImportStudentsServer) error {
+	count := int32(0)
 
 	for {
-		logMessage, err := stream.Recv()
+		message, err := stream.Recv()
 
 		if err == io.EOF {
-			summary := search.LogSummary{Count: int32(count)}
+			// No more messages on the stream
+			log.Print("Received EOF")
+			summary := api.ImportStudentsResponse{Count: count}
 			return stream.SendAndClose(&summary)
 		}
 
@@ -69,14 +67,20 @@ func (s *server) RecordLogMessages(stream search.SearchService_RecordLogMessages
 			return err
 		}
 
-		count++
-
 		// Process message
-		log.Printf("Message: %s", logMessage.Message)
+		for _, student := range message.Students {
+			log.Printf("Importing student: %s", student.Name)
+			time.Sleep(200 * time.Millisecond)
+			count++
+		}
 	}
 }
 
-func (s *server) LogChat(stream search.SearchService_LogChatServer) error {
+func (s *server) ImportStudentsV2(stream api.StudentsService_ImportStudentsV2Server) error {
+	generateRandomNumber := func(min, max int32) int32 {
+		return rand.Int31n(max-min+1) + min
+	}
+
 	for {
 		in, err := stream.Recv()
 		if err == io.EOF {
@@ -87,14 +91,18 @@ func (s *server) LogChat(stream search.SearchService_LogChatServer) error {
 			return err
 		}
 
-		log.Printf("Received message: %s", in.Message)
+		log.Printf("Importing %d students", len(in.Students))
 
 		// Do some work
 		time.Sleep(500 * time.Millisecond)
 
-		message := search.LogMessage{
-			Message: fmt.Sprintf("Processed log message: %s", in.Message),
+		log.Print("Generating IDs...")
+		for _, student := range in.Students {
+			student.Id = generateRandomNumber(1, 10000)
 		}
+
+		log.Print("Sending response...")
+		message := api.ImportStudentsV2Response{Students: in.Students}
 		err = stream.Send(&message)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
@@ -111,10 +119,10 @@ func main() {
 	grpcServer := grpc.NewServer()
 	server := server{}
 
-	search.RegisterSearchServiceServer(grpcServer, &server)
+	api.RegisterStudentsServiceServer(grpcServer, &server)
 
-	println("Starting server...")
-	fmt.Printf("Listening on %s\n", listener.Addr())
+	log.Print("Starting server...")
+	log.Printf("Listening on %s", listener.Addr())
 
 	if err := grpcServer.Serve(listener); err != nil {
 		log.Fatalf("Error starting server: %v", err)

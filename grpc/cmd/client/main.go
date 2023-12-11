@@ -3,7 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/simonhammes/301-cloud-computing-project/grpc/search"
+	"github.com/go-faker/faker/v4"
+	"github.com/simonhammes/301-cloud-computing-project/grpc/api"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"io"
@@ -16,59 +17,73 @@ func usage() string {
 	return "Usage: client <unary|server-streaming|client-streaming|bidirectional>"
 }
 
-func unaryExample(client search.SearchServiceClient) {
-	request := search.SearchRequest{
-		Query:          "search term",
-		PageNumber:     5,
-		ResultsPerPage: 10,
+func generateFakeStudents(n int) []*api.Student {
+	// Preallocate
+	students := make([]*api.Student, n)
+
+	for j := 0; j < n; j++ {
+		name := fmt.Sprintf("%s %s", faker.FirstName(), faker.LastName())
+		// No ID on purpose
+		students[j] = &api.Student{Name: name}
 	}
 
-	response, err := client.Search(context.Background(), &request)
+	return students
+}
+
+func unaryExample(client api.StudentsServiceClient) {
+	request := api.GetStudentByIdRequest{Id: 3}
+
+	log.Print("Calling GetStudentById()")
+	response, err := client.GetStudentById(context.Background(), &request)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
-	fmt.Printf("%+v", response)
+	log.Printf("Student: ID = %d, Name = %s", response.Id, response.Name)
 }
 
-func serverStreamingExample(client search.SearchServiceClient) {
-	request := search.PrimeGenerationRequest{Limit: 100}
+func serverStreamingExample(client api.StudentsServiceClient) {
+	request := api.GetStudentsRequest{PerMessage: 5}
 
-	stream, err := client.GeneratePrimes(context.Background(), &request)
+	log.Print("Calling GetStudents()")
+	stream, err := client.GetStudents(context.Background(), &request)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
 	for {
-		prime, err := stream.Recv()
+		response, err := stream.Recv()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
-		fmt.Printf("Next Prime: %d\n", prime.Prime)
+
+		for _, student := range response.Students {
+			log.Printf("Student: %s", student.Name)
+		}
 	}
 }
 
-func clientStreamingExample(client search.SearchServiceClient) {
-	stream, err := client.RecordLogMessages(context.Background())
+func clientStreamingExample(client api.StudentsServiceClient) {
+	log.Print("Calling ImportStudents()")
+	stream, err := client.ImportStudents(context.Background())
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
 	for i := 1; i <= 10; i++ {
-		message := search.LogMessage{
-			Message: fmt.Sprintf("Log message %d", i),
-		}
+		message := api.ImportStudentsRequest{Students: generateFakeStudents(5)}
+		log.Printf("Importing %d students", len(message.Students))
 		err := stream.Send(&message)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
 
 		// Do some work
-		time.Sleep(time.Second)
+		time.Sleep(500 * time.Millisecond)
 	}
 
 	summary, err := stream.CloseAndRecv()
@@ -76,54 +91,50 @@ func clientStreamingExample(client search.SearchServiceClient) {
 		log.Fatalf("Error: %v", err)
 	}
 
-	log.Printf("Summary: %v", summary)
+	log.Printf("Summary: Imported %d students", summary.Count)
 }
 
-func bidirectionalStreamingExample(client search.SearchServiceClient) {
-	messages := []*search.LogMessage{
-		{Message: "1st message"},
-		{Message: "2nd message"},
-		{Message: "3rd message"},
-		{Message: "4th message"},
-		{Message: "5th message"},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func bidirectionalStreamingExample(client api.StudentsServiceClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	stream, err := client.LogChat(ctx)
+	log.Print("Calling ImportStudentsV2()")
+	stream, err := client.ImportStudentsV2(ctx)
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
+	// Create a channel
 	waitc := make(chan struct{})
 
-	// Start goroutine to receive messages
+	// Start goroutine to receive messages from the server
 	go func() {
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
-				// read done.
+				// No more messages
 				close(waitc)
 				return
 			}
 			if err != nil {
-				log.Fatalf("client.RouteChat failed: %v", err)
+				log.Fatalf("Error: %v", err)
 			}
-			log.Printf("Received message: %s", in.Message)
+			log.Printf("Received %d students with generated IDs", len(in.Students))
 		}
 	}()
 
 	// Send messages
-	for _, message := range messages {
-		log.Printf("Sending message: %s", message.Message)
-		err := stream.Send(message)
+	for i := 0; i < 5; i++ {
+		message := api.ImportStudentsV2Request{Students: generateFakeStudents(5)}
+		log.Printf("Importing %d students", len(message.Students))
+
+		err := stream.Send(&message)
 		if err != nil {
 			log.Fatalf("Error: %v", err)
 		}
 
 		// Do some work
-		time.Sleep(time.Second)
+		time.Sleep(3 * time.Second)
 	}
 
 	stream.CloseSend()
@@ -141,7 +152,7 @@ func main() {
 	// Close connection before exiting
 	defer connection.Close()
 
-	client := search.NewSearchServiceClient(connection)
+	client := api.NewStudentsServiceClient(connection)
 
 	if len(os.Args) < 2 {
 		println(usage())
