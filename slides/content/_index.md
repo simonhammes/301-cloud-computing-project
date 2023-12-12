@@ -12,12 +12,20 @@ Cloud Computing WS 2023/24
 
 ---
 
+## Outline
+1. OpenAPI/Swagger
+2. gRPC
+3. Comparison
+4. Demo
+
+---
+
 # OpenAPI/Swagger
 
 ---
 
 ## OpenAPI/Swagger
-- created in 2011 by Tony Tam
+- Created in 2011 by Tony Tam
 - API specification in JSON/YAML files
 - Goals:
   - Automate API documentation
@@ -150,7 +158,7 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggera
 - Created by Google in 2001 ("Stubby")
 - Open-sourced in 2015
 - Uses HTTP/2 as a transport mechanism
-  - -> abstracted away
+  - Transport layer is abstracted away
 - Uses _Protocol Buffers_ as a serialization mechanism
 - _Messages_ and _services_ are defined in `.proto` files
 
@@ -181,11 +189,40 @@ service SearchService {
 ## Workflow
 1. Define messages and services in `.proto` file(s)
 2. Use `protoc` compiler to generate code
-3. Server: Implement services  
-   Client: Execute requests
+3. Server: implement services  
+   Client: execute requests
 
 {{% note %}}
 Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd party addons
+{{% /note %}}
+
+---
+
+# Comparison
+
+---
+
+|                      | OpenAPI                  | gRPC                        |
+|----------------------|--------------------------|-----------------------------|
+| Specification Format | JSON or YAML             | Protocol Buffer Language    |
+| Describes            | HTTP methods + endpoints | Procedures                  |
+| Contract             | Optional                 | Strict                      |
+| Serialization Format | JSON*                    | Protocol Buffers*           |
+| Transport Protocol   | HTTP/1.1                 | HTTP/2                      |
+| Browser Support      | ✅                        | ⚠️                          |
+| Streaming            | -[CHECK]                 | Server/Client/Bidirectional |
+| Documentation        | Swagger UI               | e.g. protoc-gen-doc         |
+| Code Generation      | Swagger Codegen          | protoc (built-in)           |
+
+{{% note %}}
+- an API described by an OpenAPI specification can be used without the JSON/YAML file
+- for gRPC, the .proto file(s) are strictly required
+- Serialization Format:
+  - https://grpc.io/blog/grpc-with-json/
+- grpc-web: https://github.com/grpc/grpc-web [CHECK]
+  - gRPC requires _Trailers_, which are not implemented by browsers
+  - https://news.ycombinator.com/item?id=18296014
+  - https://carlmastrangelo.com/blog/why-does-grpc-insist-on-trailers
 {{% /note %}}
 
 ---
@@ -207,43 +244,3 @@ go version
 protoc --version
 ```
 {{% /note %}}
-
----
-
-## Comparison
-
-|                      | OpenAPI                  | gRPC                        |
-|----------------------|--------------------------|-----------------------------|
-| Specification Format | JSON or YAML             | Protocol Buffer Language    |
-| Describes            | HTTP methods + endpoints | Procedures                  |
-| Contract             | Optional                 | Strict                      |
-| Serialization Format | JSON*                    | Protocol Buffers (binary)   |
-| Transport Protocol   | [CHECK] HTTP/1.1         | HTTP/2                      |
-| Streaming            | -                        | Server/Client/Bidirectional |
-| Documentation        | Swagger UI               | e.g. protoc-gen-doc         |
-| Code Generation      | Swagger Codegen          | protoc (built-in)           |
-
-{{% note %}}
-- an API described by an OpenAPI specification can be used without the JSON/YAML file
-- for gRPC, the .proto file(s) are strictly required
-{{% /note %}}
-
----
-
-## Core Principles
-<!-- TODO: [Auszug] -->
-- _Services not Objects, Messages not References_
-
----
-
-## Code
-
-```go
-package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("hello world")
-}
-```
