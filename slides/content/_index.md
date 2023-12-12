@@ -167,20 +167,20 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggera
 ## Protocol Buffers
 
 ```protobuf
+// https://grpc.io/docs/what-is-grpc/introduction/
+
 syntax = "proto3";
 
-message SearchRequest {
-  string query = 1;
-  int32 page_number = 2;
-  int32 results_per_page = 3;
+message HelloRequest {
+  string name = 1;
 }
 
-message SearchResponse {
-  int32 number_of_results = 1;
+message HelloReply {
+  string message = 1;
 }
 
-service SearchService {
-  rpc Search(SearchRequest) returns (SearchResponse);
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
 }
 ```
 
