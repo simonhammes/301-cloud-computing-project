@@ -155,7 +155,8 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 \
 => CLI/Docker
 
 {{% note %}}
-- TODO: programming languages, OpenAPI -> protobuf
+- supports a variety of programming languages/frameworks
+- can even generate protobuf schemas from OpenAPI schemas
 {{% /note %}}
 
 ---
@@ -170,8 +171,7 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 \
 - _Messages_ and _services_ are defined in `.proto` files
 
 {{% note %}}
-- HTTP/2 is abstracted away: feels just like calling functions
-- TODO: code-first also possible?
+- HTTP/2 is abstracted away: feels more like calling a function
 {{% /note %}}
 
 ---
@@ -212,14 +212,15 @@ service Greeter {
 
 ---
 
-## Workflow
+## Workflow (API first)
 1. Define messages and services in `.proto` file(s)
 2. Use `protoc` compiler to generate code
 3. Server: implement services  
    Client: execute requests
 
 {{% note %}}
-Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd party addons
+- Spec-first is also possible (with limitations, e.g. using .NET)
+- Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd party addons
 {{% /note %}}
 
 ---
@@ -234,7 +235,7 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 | Serialization Format | JSON*                    | Protocol Buffers*           |
 | Transport Protocol   | HTTP/1.1                 | HTTP/2                      |
 | Browser Support      | ✅                        | ⚠️                          |
-| Streaming            | -[TODO]                  | Server/Client/Bidirectional |
+| Streaming            | ⚠️                       | Server/Client/Bidirectional |
 | Documentation        | Swagger UI               | e.g. protoc-gen-doc         |
 | Code Generation      | Swagger Codegen          | protoc (built-in)           |
 
@@ -243,10 +244,13 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 - for gRPC, the .proto file(s) are strictly required
 - Serialization Format:
   - https://grpc.io/blog/grpc-with-json/
-- grpc-web: https://github.com/grpc/grpc-web [TODO]
+- grpc-web: https://github.com/grpc/grpc-web
   - gRPC requires _Trailers_, which are not implemented by browsers
+  - -> requires proxy
   - https://news.ycombinator.com/item?id=18296014
   - https://carlmastrangelo.com/blog/why-does-grpc-insist-on-trailers
+- Streaming: is possible with limitations
+  - https://github.com/OAI/OpenAPI-Specification/issues/1576
 {{% /note %}}
 
 ---
