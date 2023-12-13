@@ -20,25 +20,23 @@ Cloud Computing WS 2023/24
 
 ---
 
-# OpenAPI/Swagger
-
----
-
 ## OpenAPI/Swagger
 - Created in 2011 by Tony Tam
 - API specification in JSON/YAML files
+- Allows spec-first and code-first approaches
 - Goals:
   - Automate API documentation
   - Generate code for API clients
 - 2016: Specification was renamed to OpenAPI
 
+{{% note %}}
+- Tony Tam: co-founder of Wordnik (online dictionary)
+- 2016: Swagger = tooling around REST APIs
+{{% /note %}}
+
 ---
 
-# OpenAPI Specification
-
----
-
-## Structure
+## Specification
 
 ```yaml
 openapi: 3.0.0
@@ -50,10 +48,12 @@ info:
 
 servers:
   - url: https://api.hs-worms.de/v1
+  - url: https://test.api.hs-worms.de/v1
 
 paths: {}
 
 components:
+  # Reusable schema objects
   schemas: {}
 ```
 
@@ -61,13 +61,19 @@ components:
 
 ## Paths
 
-// TODO: Parameters?
-
 ```yaml
 paths:
   /students:
     get:
       summary: Get all students
+      parameters:
+        - in: query # path/query/header/cookie
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+          required: true
+          description: Number of items
       responses:
         200:
           description: A list of students.
@@ -77,13 +83,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Student'
+        400:
+          description: Missing or invalid limit parameter
 ```
 
 ---
 
 ## Components
-
-<!-- TODO -->
 
 ```yaml
 components:
@@ -114,6 +120,10 @@ components:
           type: string
           description: Course description
 ```
+
+{{% note %}}
+- it's also possible to specify reusable response objects
+{{% /note %}}
 
 ---
 
