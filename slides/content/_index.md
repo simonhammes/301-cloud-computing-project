@@ -273,6 +273,15 @@ protoc --version
 
 ---
 
+{{< slide class="references" >}}
 ## References
-- TODO
+- https://swagger.io/docs/open-source-tools/swagger-codegen/
+- https://grpc.io/about/
+- https://grpc.io/blog/principles/
+- https://cloud.google.com/blog/products/gcp/grpc-a-true-internet-scale-rpc-framework-is-now-1-and-ready-for-production-deployments
+- https://protobuf.dev/overview/
+- https://protobuf.dev/programming-guides/proto3/
+- https://grpc.io/docs/protoc-installation/
+- https://www.redhat.com/en/blog/comparing-openapi-grpc
+- https://cloud.google.com/blog/products/api-management/understanding-grpc-openapi-and-rest-and-when-to-use-them?hl=en
 - https://www.ionos.com/digitalguide/fileadmin/DigitalGuide/Screenshots_2020/diagram-of-streaming-with-http2.png

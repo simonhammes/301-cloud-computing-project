@@ -17,3 +17,7 @@ table tbody tr:nth-child(odd) {
 td:first-child {
     font-weight: bold
 }
+
+.references li {
+    font-size: 20px;
+}
