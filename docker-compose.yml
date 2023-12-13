@@ -5,9 +5,9 @@ services:
     # https://swagger.io/docs/open-source-tools/swagger-ui/usage/installation/
     image: swaggerapi/swagger-ui:v5.10.3
     environment:
-      SWAGGER_JSON: "/app/openapi.yaml"
+      SWAGGER_JSON: "/app/students.yaml"
     volumes:
-      - "./swagger:/app"
+      - "./swagger:/app:ro"
     ports:
       - "8080:8080"
   slides:

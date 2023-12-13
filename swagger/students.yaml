@@ -1,0 +1,62 @@
+openapi: 3.0.0
+
+info:
+  title: Students
+  description: Students API
+  version: 1.0.0
+
+servers:
+  - url: https://api.hs-worms.de/v1
+  - url: https://test.api.hs-worms.de/v1
+
+paths:
+  /students:
+    get:
+      summary: Get all students
+      parameters:
+        - in: query # path/query/header/cookie
+          name: limit
+          schema:
+            type: integer
+            minimum: 1
+          required: true
+          description: Number of items
+      responses:
+        200:
+          description: A list of students.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+        400:
+          description: Missing or invalid limit parameter
+
+components:
+  schemas:
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Student ID
+        name:
+          type: string
+          description: Name
+        courses:
+          type: array
+          items:
+            $ref: '#/components/schemas/Course'
+    Course:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Course ID
+        name:
+          type: string
+          description: Course name
+        description:
+          type: string
+          description: Course description

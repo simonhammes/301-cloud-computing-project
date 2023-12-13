@@ -127,17 +127,14 @@ components:
 
 ---
 
-# Swagger Tools
-
----
-
 ## Swagger UI
 
-// TODO: Screenshot of aforementioned API
-
 ```shell
-docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggerapi/swagger-ui
+docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 \
+    swaggerapi/swagger-ui
 ```
+
+![Swagger UI](/images/swagger-ui.png)
 
 ---
 
@@ -145,7 +142,7 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggera
 
 [editor.swagger.io](https://editor.swagger.io)
 
-// TODO: Screenshot of aforementioned API
+![Swagger Editor](/images/swagger-editor.png)
 
 ---
 
@@ -157,9 +154,9 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggera
 
 => CLI/Docker
 
----
-
-# gRPC
+{{% note %}}
+- TODO: programming languages, OpenAPI -> protobuf
+{{% /note %}}
 
 ---
 
@@ -171,6 +168,11 @@ docker run -v ${PWD}:/app -e SWAGGER_JSON=/app/students.yaml -p 80:8080 swaggera
   - Transport layer is abstracted away
 - Uses _Protocol Buffers_ as a serialization mechanism
 - _Messages_ and _services_ are defined in `.proto` files
+
+{{% note %}}
+- HTTP/2 is abstracted away: feels just like calling functions
+- TODO: code-first also possible?
+{{% /note %}}
 
 ---
 
@@ -194,6 +196,20 @@ service Greeter {
 }
 ```
 
+{{% note %}}
+- this example is unary (simple request/response)
+{{% /note %}}
+
+---
+
+## Streaming
+
+![gRPC Streaming](/images/grpc-streaming.png)
+
+{{% note %}}
+- Streaming: message order is guaranteed
+{{% /note %}}
+
 ---
 
 ## Workflow
@@ -208,9 +224,7 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 
 ---
 
-# Comparison
-
----
+## Comparison
 
 |                      | OpenAPI                  | gRPC                        |
 |----------------------|--------------------------|-----------------------------|
@@ -220,7 +234,7 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 | Serialization Format | JSON*                    | Protocol Buffers*           |
 | Transport Protocol   | HTTP/1.1                 | HTTP/2                      |
 | Browser Support      | ✅                        | ⚠️                          |
-| Streaming            | -[CHECK]                 | Server/Client/Bidirectional |
+| Streaming            | -[TODO]                  | Server/Client/Bidirectional |
 | Documentation        | Swagger UI               | e.g. protoc-gen-doc         |
 | Code Generation      | Swagger Codegen          | protoc (built-in)           |
 
@@ -229,7 +243,7 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 - for gRPC, the .proto file(s) are strictly required
 - Serialization Format:
   - https://grpc.io/blog/grpc-with-json/
-- grpc-web: https://github.com/grpc/grpc-web [CHECK]
+- grpc-web: https://github.com/grpc/grpc-web [TODO]
   - gRPC requires _Trailers_, which are not implemented by browsers
   - https://news.ycombinator.com/item?id=18296014
   - https://carlmastrangelo.com/blog/why-does-grpc-insist-on-trailers
@@ -237,11 +251,9 @@ Directly supported languages include: C++, C#, Java, Python, Ruby and Go; 3rd pa
 
 ---
 
-# Demo
+## Demo
 
----
-
-## Prerequisites
+Prerequisites:
 - Go
 - protoc
 - protoc plugins for Go
@@ -254,3 +266,9 @@ go version
 protoc --version
 ```
 {{% /note %}}
+
+---
+
+## References
+- TODO
+- https://www.ionos.com/digitalguide/fileadmin/DigitalGuide/Screenshots_2020/diagram-of-streaming-with-http2.png
